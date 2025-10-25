@@ -3,6 +3,9 @@
 
 GIT_REPO := "https://github.com/Ardour/ardour.git"
 
+# number of jobs fewer than number of CPUs
+CPU_MINUS_JOBS := "2"
+
 # List all recipes
 list:
     @just --list
@@ -124,8 +127,9 @@ compile:
         just configure
     fi
 
-    echo "🔨 Compiling (this will take a while)..."
-    ./waf -j$(sysctl -n hw.ncpu)
+    JOBS=$(($(sysctl -n hw.ncpu) - {{CPU_MINUS_JOBS}}))
+    echo "🔨 Compiling with $JOBS jobs (this will take a while)..."
+    ./waf -j$JOBS
     echo "✅ Compilation complete"
 
 # Run the development version
